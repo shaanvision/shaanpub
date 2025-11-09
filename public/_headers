@@ -1,0 +1,16 @@
+# ActivityPub Headers
+/.well-known/webfinger
+  Content-Type: application/jrd+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/.well-known/nodeinfo.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/ap/*.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/ap/posts/*.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *

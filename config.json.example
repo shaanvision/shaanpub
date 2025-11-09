@@ -1,0 +1,22 @@
+{
+  "name": "Your Site Name",
+  "url": "https://example.com",
+  "ogImage": "https://example.com/og-image.png",
+  "description": "Your site description.",
+  "author": {
+    "name": "Your Name",
+    "handle": "yourhandle",
+    "bio": "A short bio about yourself.",
+    "avatar": "https://example.com/avatar.png",
+    "links": [
+      {
+        "label": "Website",
+        "href": "https://your-website.com"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/yourusername"
+      }
+    ]
+  }
+}
