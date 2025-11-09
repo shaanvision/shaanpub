@@ -25,10 +25,10 @@ export async function generateMetadata({
 
   return {
     title: post.title,
-    description: 'A post from my static Fediverse profile.',
+    description: 'ShaanPub A post from my static Fediverse profile.',
     openGraph: {
       title: post.title,
-      description: 'A post from my static Fediverse profile.',
+      description: 'ShaanPub A post from my static Fediverse profile.',
       url: `${siteConfig.url}/posts/${slug}`,
       type: 'article',
       publishedTime: post.published,
