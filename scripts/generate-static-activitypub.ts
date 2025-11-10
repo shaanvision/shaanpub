@@ -102,17 +102,20 @@ function generateRedirectPage() {
 function generateWebFinger() {
   return {
     subject: `acct:${HANDLE}@${DOMAIN}`,
-    aliases: [`${BASE_URL}/ap/actor`, `${BASE_URL}/`],
+    aliases: [
+      `${BASE_URL}/users/${HANDLE}.json`,
+      `${BASE_URL}/@${HANDLE}`
+    ],
     links: [
       {
         rel: "http://webfinger.net/rel/profile-page",
         type: "text/html",
-        href: BASE_URL,
+        href: `${BASE_URL}/@${HANDLE}`,
       },
       {
         rel: "self",
         type: "application/activity+json",
-        href: `${BASE_URL}/ap/actor`,
+        href: `${BASE_URL}/users/${HANDLE}.json`,
       },
     ],
   };
@@ -122,44 +125,40 @@ function generateWebFinger() {
 async function generateActor(publicKey: string) {
   return {
     "@context": [
-        "https://www.w3.org/ns/activitystreams",
-        "https://w3id.org/security/v1",
-        {
-          "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
-          "toot": "http://joinmastodon.org/ns#",
-          "featured": { "@id": "toot:featured", "@type": "@id" },
-          "featuredTags": { "@id": "toot:featuredTags", "@type": "@id" },
-          "alsoKnownAs": { "@id": "as:alsoKnownAs", "@type": "@id" },
-          "movedTo": { "@id": "as:movedTo", "@type": "@id" },
-          "schema": "http://schema.org#",
-          "PropertyValue": "schema:PropertyValue",
-          "value": "schema:value",
-          "discoverable": "toot:discoverable",
-          "suspended": "toot:suspended",
-          "memorial": "toot:memorial",
-          "indexable": "toot:indexable",
-          "attributionDomains": { "@id": "toot:attributionDomains", "@type": "@id" }
-        }
-      ],
-    id: `${BASE_URL}/ap/actor`,
-    type: "Application",
+      "https://www.w3.org/ns/activitystreams",
+      "https://w3id.org/security/v1"
+    ],
+    id: `${BASE_URL}/users/${HANDLE}.json`,
+    type: "Person",
     preferredUsername: HANDLE,
-    inbox: `${BASE_URL}/ap/inbox`,
-    outbox: `${BASE_URL}/ap/outbox`,
-    followers: `${BASE_URL}/ap/followers`,
-    following: `${BASE_URL}/ap/following`,
-    featured: `${BASE_URL}/ap/collections/featured`,
-    featuredTags: `${BASE_URL}/ap/collections/tags`,
+    name: config.author.name,
+    summary: config.author.summary,
+    inbox: `${BASE_URL}/users/${HANDLE}/inbox.json`,
+    outbox: `${BASE_URL}/users/${HANDLE}/outbox.json`,
+    followers: `${BASE_URL}/users/${HANDLE}/followers.json`,
+    following: `${BASE_URL}/users/${HANDLE}/following.json`,
+    featured: `${BASE_URL}/users/${HANDLE}/collections/featured.json`,
+    featuredTags: `${BASE_URL}/users/${HANDLE}/collections/tags.json`,
     publicKey: {
-        id: `${BASE_URL}/ap/actor#main-key`,
-        owner: `${BASE_URL}/ap/actor`,
+        id: `${BASE_URL}/users/${HANDLE}.json#main-key`,
+        owner: `${BASE_URL}/users/${HANDLE}.json`,
         publicKeyPem: publicKey
     },
-    endpoints: { sharedInbox: `${BASE_URL}/ap/inbox` },
-    url: `${BASE_URL}/about`,
-    manuallyApprovesFollowers: true,
+    endpoints: { sharedInbox: `${BASE_URL}/inbox.json` },
+    url: `${BASE_URL}/@${HANDLE}`,
+    manuallyApprovesFollowers: config.author.manuallyApprovesFollowers,
     discoverable: true,
-    indexable: true
+    indexable: true,
+    icon: {
+      type: "Image",
+      mediaType: "image/png",
+      url: config.author.icon,
+    },
+    image: {
+      type: "Image",
+      mediaType: "image/png",
+      url: config.author.image,
+    },
   };
 }
 
@@ -177,32 +176,20 @@ function emptyCollection(id: string) {
 // Outbox JSON
 function generateOutbox() {
   const items = posts.map((post: any) => ({
-    id: `${BASE_URL}/ap/posts/${post.slug}#activity`,
+    id: `${BASE_URL}/users/${HANDLE}/posts/${post.slug}#activity`,
     type: "Create",
-    actor: `${BASE_URL}/ap/actor`,
+    actor: `${BASE_URL}/users/${HANDLE}.json`,
     published: post.published,
     to: ["https://www.w3.org/ns/activitystreams#Public"],
-    cc: [`${BASE_URL}/ap/followers`],
-    object: `${BASE_URL}/ap/posts/${post.slug}`,
+    cc: [`${BASE_URL}/users/${HANDLE}/followers.json`],
+    object: `${BASE_URL}/users/${HANDLE}/posts/${post.slug}.json`,
   }));
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${BASE_URL}/ap/outbox`,
+    id: `${BASE_URL}/users/${HANDLE}/outbox.json`,
     type: "OrderedCollection",
     totalItems: posts.length,
     orderedItems: items,
-  };
-}
-
-// Nodeinfo JSON
-function generateNodeInfo() {
-  return {
-    version: "2.0",
-    software: { name: "ShaanPub", version: "1.0.0" },
-    protocols: ["activitypub"],
-    usage: { users: { total: 1 }, localPosts: posts.length },
-    openRegistrations: false,
-    metadata: {},
   };
 }
 
@@ -220,27 +207,27 @@ async function generatePostJsons() {
   for (const post of posts) {
     const data = {
       "@context": "https://www.w3.org/ns/activitystreams",
-      id: `${BASE_URL}/ap/posts/${post.slug}`,
+      id: `${BASE_URL}/users/${HANDLE}/posts/${post.slug}.json`,
       type: "Note",
       published: post.published,
-      attributedTo: `${BASE_URL}/ap/actor`,
+      attributedTo: `${BASE_URL}/users/${HANDLE}.json`,
       content: post.content,
-      url: `${BASE_URL}/posts/${post.slug}`,
+      url: `${BASE_URL}/@${HANDLE}/${post.slug}`,
       to: ["https://www.w3.org/ns/activitystreams#Public"],
-      cc: [`${BASE_URL}/ap/followers`],
+      cc: [`${BASE_URL}/users/${HANDLE}/followers.json`],
       sensitive: post.sensitive || false,
       likes: {
-        id: `${BASE_URL}/ap/posts/${post.slug}/likes`,
+        id: `${BASE_URL}/users/${HANDLE}/posts/${post.slug}/likes.json`,
         type: "OrderedCollection",
         totalItems: 0,
       },
       shares: {
-        id: `${BASE_URL}/ap/posts/${post.slug}/shares`,
+        id: `${BASE_URL}/users/${HANDLE}/posts/${post.slug}/shares.json`,
         type: "OrderedCollection",
         totalItems: 0,
       },
     };
-    await writeJsonToFile(`ap/posts/${post.slug}.json`, data);
+    await writeJsonToFile(`users/${HANDLE}/posts/${post.slug}.json`, data);
   }
 }
 
@@ -252,28 +239,21 @@ async function main() {
 
   await writeJsonToFile(".well-known/webfinger", generateWebFinger());
   await writeXmlToFile(".well-known/host-meta.xml", generateHostMeta());
-  await writeJsonToFile(".well-known/nodeinfo.json", {
-    links: [
-      {
-        rel: "http://nodeinfo.diaspora.software/ns/schema/2.0",
-        href: `${BASE_URL}/ap/nodeinfo`,
-      },
-    ],
-  });
 
-  await writeJsonToFile("ap/actor.json", await generateActor(publicKey));
-  await writeJsonToFile("ap/inbox.json", emptyCollection(`${BASE_URL}/ap/inbox`));
-  await writeJsonToFile("ap/outbox.json", generateOutbox());
-  await writeJsonToFile("ap/followers.json", emptyCollection(`${BASE_URL}/ap/followers`));
-  await writeJsonToFile("ap/following.json", emptyCollection(`${BASE_URL}/ap/following`));
-  await writeJsonToFile("ap/nodeinfo.json", generateNodeInfo());
-  await writeJsonToFile("ap/collections/featured.json", emptyCollection(`${BASE_URL}/ap/collections/featured`));
-  await writeJsonToFile("ap/collections/tags.json", emptyCollection(`${BASE_URL}/ap/collections/tags`));
+  await writeJsonToFile(`users/${HANDLE}.json`, await generateActor(publicKey));
+  await writeJsonToFile("inbox.json", emptyCollection(`${BASE_URL}/inbox.json`));
+  await writeJsonToFile(`users/${HANDLE}/inbox.json`, emptyCollection(`${BASE_URL}/users/${HANDLE}/inbox.json`));
+  await writeJsonToFile(`users/${HANDLE}/outbox.json`, generateOutbox());
+  await writeJsonToFile(`users/${HANDLE}/followers.json`, emptyCollection(`${BASE_URL}/users/${HANDLE}/followers.json`));
+  await writeJsonToFile(`users/${HANDLE}/following.json`, emptyCollection(`${BASE_URL}/users/${HANDLE}/following.json`));
+  await writeJsonToFile(`users/${HANDLE}/collections/featured.json`, emptyCollection(`${BASE_URL}/users/${HANDLE}/collections/featured.json`));
+  await writeJsonToFile(`users/${HANDLE}/collections/tags.json`, emptyCollection(`${BASE_URL}/users/${HANDLE}/collections/tags.json`));
 
   await generatePostJsons();
 
   // Generate redirect page
   await writeHtmlToFile(`@${HANDLE}/index.html`, generateRedirectPage());
+  await writeHtmlToFile(`users/${HANDLE}/index.html`, generateRedirectPage());
 
   console.log("\n✅ All ActivityPub files generated successfully!");
 }

@@ -1,16 +1,33 @@
-# ActivityPub Headers
+# _headers dosyası
+
+/users/*.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/users/*/inbox.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/users/*/outbox.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/users/*/followers.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/users/*/following.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+/users/*/collections/*.json
+  Content-Type: application/activity+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
 /.well-known/webfinger
   Content-Type: application/jrd+json; charset=utf-8
   Access-Control-Allow-Origin: *
 
-/.well-known/nodeinfo.json
-  Content-Type: application/activity+json; charset=utf-8
-  Access-Control-Allow-Origin: *
-
-/ap/*.json
-  Content-Type: application/activity+json; charset=utf-8
-  Access-Control-Allow-Origin: *
-
-/ap/posts/*.json
+/inbox.json
   Content-Type: application/activity+json; charset=utf-8
   Access-Control-Allow-Origin: *
