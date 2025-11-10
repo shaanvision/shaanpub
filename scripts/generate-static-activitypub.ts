@@ -175,6 +175,11 @@ async function generateActor(publicKey: string) {
       mediaType: "image/png",
       url: config.author.image,
     },
+    attachment: config.author.links.map(link => ({
+      type: "PropertyValue",
+      name: link.label,
+      value: `<a href="${link.href}" rel="me nofollow noopener noreferrer" target="_blank">${link.href}</a>`,
+    })),
   };
 }
 

@@ -5,7 +5,7 @@
   "description": "A read-only, discoverable, and static ActivityPub profile for the Fediverse.",
   "author": {
     "name": "Shaan Vision",
-    "summary": "ShaanPub - Custom ActivityPub implementation",
+    "summary": "ShaanPub - Shaan Vision. Modern işletmeler için yenilikçi yazılım çözümleri geliştiriyor, açık kaynak felsefesini destekliyoruz. Teknoloji, kod ve gelecek üzerine konuşalım",
     "icon": "https://www.shaanvision.com.tr/logo.png",
     "image": "https://www.shaanvision.com.tr/logo.png",
     "handle": "shaanvision",
