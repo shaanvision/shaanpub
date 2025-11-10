@@ -1,82 +1,189 @@
-# ShaanPub
+# ShaanPub (BETA)
 
-**[Click for English README](README.md)**
+Salt Okunur Fediverse Profilleri için Hafif Statik ActivityPub Sunucusu – Shaan Vision
 
-ShaanPub'a hoş geldiniz! Bu proje, Next.js ile oluşturulmuş modern, hafif ve genişletilebilir bir ActivityPub sunucusudur. Fediverse üzerinde kendi merkezi olmayan sosyal medya kimliğinizi barındırmanıza olanak tanır.
+---
+_English documentation available in [README.md](README.md)_
+---
+## Genel Bakış
 
-[Shaan Vision](https://www.shaanvision.com.tr) tarafından geliştirilmiştir.
+**ShaanPub**, kimlik doğrulama veya etkileşim özellikleri olmadan salt okunur bir Fediverse profili yayınlamak için tasarlanmış TypeScript tabanlı, statik bir ActivityPub sunucusudur. Kişisel portfolyo, blog veya marka kimliği yayını için uygundur. ShaanPub sayesinde içerikleriniz Mastodon ve Pleroma gibi Fediverse ağlarına ActivityPub protokolü ile entegre edilebilir.
 
-## Özellikler ve Sınırlamalar
+- **Ana Dil**: TypeScript
+- **Diğer Diller**: JavaScript, CSS
+- **Lisans**: MIT
+- **Durum**: BETA
+- **Fediverse Örneği**: [@shaanvision@social.shaanvision.com.tr](https://social.shaanvision.com.tr/@shaanvision)
 
-Bu proje, Fediverse'de bir varlık oluşturmanın basit ve verimli bir yolunu sunar. Profilinizi ve gönderilerinizi görüntülemek için bir web arayüzü içerir. Ancak, bu statik yaklaşımın getirdiği avantaj ve dezavantajları anlamak önemlidir.
+---
 
-### Avantajlar
+## Özellikler
 
-*   **Hafif ve Hızlı:** Statik bir site olduğu için son derece hızlıdır ve minimum sunucu kaynağı gerektirir.
-*   **Kolay Dağıtım:** Derleme süreci, Node.js'yi destekleyen herhangi bir platformda barındırılabilen basit bir statik dosya dizini oluşturur.
-*   **Güvenli:** Kullanıcı etkileşimleri için dinamik sunucu tarafı işleme olmadığından, saldırı yüzeyi önemli ölçüde azalır.
+- ActivityPub uyumlu JSON uç noktalarını uygular (WebFinger, actor, outbox vb.)
+- Salt okunur profil ve içerik sunar, etkileşim/veri tabanı gerekmez
+- Statik hosting ile kolayca kullanılabilir
+- Basit JSON dosyaları ile kolay yapılandırma
+- Profil ve gönderi verileriyle kolay kurulum
+- Farklı Fediverse sunucularıyla uyumlu çalışacak şekilde tasarlanmıştır
+- Profil doğrulama için açık anahtar yayınlama imkanı
 
-### Dezavantajlar
+---
 
-*   **Salt Okunur Kimlik:** Bu statik bir uygulamadır, bu da dinamik ActivityPub özelliklerini desteklemediği anlamına gelir. Fediverse'deki kimliğiniz "salt okunur" olacaktır.
-*   **Dinamik Etkileşim Yok:** Diğer kullanıcıları takip etme, takip edilme, bildirim alma veya içeriği gerçek zamanlı olarak birleştirme gibi işlevler desteklenmez.
-*   **Manuel Güncellemeler:** Yeni gönderiler veya profil değişiklikleri, tüm sitenin yeniden oluşturulmasını ve yeniden dağıtılmasını gerektirir.
+## Fediverse Entegrasyon Örneği
 
-## Nasıl Çalışır?
+- WebFinger:  
+  `https://social.shaanvision.com.tr/.well-known/webfinger?resource=acct:shaanvision@social.shaanvision.com.tr`
 
-ShaanPub, statik bir Next.js sitesinin gücünü özel bir Express.js sunucusuyla birleştiren hibrit bir mimari kullanır. İşte sürecin bir dökümü:
+Yanıt:
+```json
+{
+  "subject": "acct:shaanvision@social.shaanvision.com.tr",
+  "aliases": [
+    "https://social.shaanvision.com.tr/users/shaanvision.json",
+    "https://social.shaanvision.com.tr/@shaanvision"
+  ],
+  "links": [
+    {
+      "rel": "http://webfinger.net/rel/profile-page",
+      "type": "text/html",
+      "href": "https://social.shaanvision.com.tr/@shaanvision"
+    },
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://social.shaanvision.com.tr/users/shaanvision.json"
+    }
+  ]
+}
+```
 
-1.  **Statik Site Oluşturma:** `output: 'export'` ile yapılandırılmış `next build` komutu, Next.js ön yüzünün tamamen statik bir sürümünü `out/` dizinine oluşturur.
-2.  **ActivityPub Dosyası Oluşturma:** Derlemeden sonra, `scripts/generate-static-activitypub.ts` betiği çalışır. ActivityPub için gerekli statik JSON dosyalarını (`actor.json`, `.well-known/webfinger` vb.) oluşturur ve bunları `out/` dizinine yerleştirir.
-3.  **Özel Express Sunucusu:** Standart bir statik dosya sunucusu yerine, ShaanPub özel bir sunucu (`server.mjs`) kullanır. Bu, ActivityPub ve WebFinger rotaları için doğru `Content-Type` başlıklarını (ör. `application/activity+json`) ayarlamak için çok önemlidir, ki bu standart bir Next.js statik dışa aktarımı ile mümkün değildir. Sunucu ayrıca Next.js sayfaları için temiz URL yönlendirmesini de yönetir.
+- Actor Uç Noktası (`application/activity+json`):  
+  `https://social.shaanvision.com.tr/users/shaanvision.json`
 
-## Proje Yapısı
+Yanıt:
+```json
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://w3id.org/security/v1",
+    ...
+  ],
+  "id": "https://social.shaanvision.com.tr/users/shaanvision.json",
+  "type": "Person",
+  "preferredUsername": "shaanvision",
+  "name": "Shaan Vision",
+  "summary": "ShaanPub - Shaan Vision. Kurumlara modern yazılım çözümleri geliştiriyoruz ve açık kaynak felsefesini destekliyoruz. Teknoloji, kod ve gelecek üzerine konuşalım.",
+  "inbox": "https://social.shaanvision.com.tr/users/shaanvision/inbox.json",
+  "outbox": "https://social.shaanvision.com.tr/users/shaanvision/outbox.json",
+  ... // detaylı örnek için dokümantasyona bakınız
+}
+```
 
--   `src/app/`: Next.js uygulamasının yaşadığı yer burasıdır. Tüm ön yüz sayfaları ve bileşenleri buradadır.
--   `public/`: Bu dizin, doğrudan sunulan resimler ve yazı tipleri gibi statik varlıkları içerir.
--   `scripts/`: Bu dizin yardımcı betikleri içerir.
-    -   `generate-static-activitypub.ts`: Bu betik, Next.js derlemesi tamamlandıktan sonra statik ActivityPub dosyalarını oluşturmaktan sorumludur.
--   `out/`: Bu dizin, derleme işlemi tarafından oluşturulur ve özel sunucu tarafından sunulan son statik siteyi ve ActivityPub dosyalarını içerir. **Bu dizini doğrudan düzenlemeyin.**
--   `server.mjs`: `out/` dizininden statik dosyaları sunan ve ActivityPub için özel yönlendirmeyi yöneten özel Express.js sunucusu.
+---
 
-## Başlarken
+## Kullanıma Başlangıç
 
-### Önkoşullar
+### Gereksinimler
 
--   Node.js (v18 veya üstü)
--   npm
+- Node.js v18+
+- npm/yarn
 
 ### Kurulum
 
-1.  Depoyu klonlayın:
-    ```bash
-    git clone <repository-url>
-    ```
-2.  Bağımlılıkları yükleyin:
-    ```bash
-    npm install
-    ```
+```sh
+git clone https://github.com/shaanvision/shaanpub.git
+cd shaanpub
+npm install
+```
 
-### Yerel Geliştirme
+### Yapılandırma
 
-1.  Next.js geliştirme sunucusunu çalıştırmak için (ön yüz çalışması için):
-    ```bash
-    npm run dev
-    ```
-2.  Statik siteyi ve ActivityPub dosyalarını oluşturmak için:
-    ```bash
-    npm run build
-    ```
-3.  Özel sunucuyu çalıştırmak ve tam uygulamayı test etmek için:
-    ```bash
-    npm start
-    ```
+- Örnek dosyaları kopyalayın:
+  ```sh
+  cp config.json.example config.json
+  cp posts.json.example posts.json
+  ```
+- `config.json` dosyasını (profil bilgileri) ve `posts.json` dosyasını (gönderiler) düzenleyin.
+- `public.pem` dosyasına açık anahtarınızı yerleştirin.
 
-## Dağıtım
+#### Anahtar Çifti Üretme Örneği
 
-ShaanPub'ı dağıtmak için, bir Node.js uygulamasını çalıştırabilen bir barındırma sağlayıcısına ihtiyacınız vardır.
+```sh
+openssl genrsa -out private.pem 2048
+openssl rsa -in private.pem -outform PEM -pubout -out public.pem
+```
 
-1.  Kodunuzu barındırma sağlayıcısına itin.
-2.  Derleme komutunun `npm run build` olarak ayarlandığından emin olun.
-3.  Başlatma komutunun `npm start` olarak ayarlandığından emin olun.
-4.  Sağlayıcı derlemeyi çalıştıracak, statik dosyaları oluşturacak ve ardından uygulamanızı sunmak için özel sunucuyu başlatacaktır.
+### Sunucuyu Çalıştırma
+
+```sh
+node server.mjs
+```
+Veya statik eksport için build araçlarını/scripts dizinini kullanabilirsiniz.
+
+### Klasör Yapısı
+
+- `src/` – Tüm TypeScript kaynak kodları
+- `server.mjs` – HTTP sunucu & REST uç noktaları
+- `config.json` – Profil yapılandırması
+- `posts.json` – Gönderi verileri
+- `public/` – Statik dosyalar
+- `public.pem` – Açık anahtar
+- Ek yapılandırmalar: Next.js, Tailwind, PostCSS
+
+---
+
+## API Uç Noktaları
+
+- `/.well-known/webfinger` – WebFinger kaynağı
+- `/users/{username}.json` – ActivityPub actor objesi (profil)
+- `/users/{username}/outbox.json` – Gönderi/aktivite listesi
+- `/users/{username}/inbox.json` – ActivityPub gelen kutusu (salt okunur)
+- `/users/{username}/followers.json` – Takipçi listesi (statik/boş olabilir)
+
+Tüm uç noktalar `application/activity+json` veya `application/jrd+json` formatında çalışır.
+
+---
+
+## Örnek Yapılandırma Dosyaları
+
+Hızlı başlangıç için [`config.json.example`](config.json.example) ve [`posts.json.example`](posts.json.example) dosyalarını inceleyin.
+
+---
+
+## Fediverse Profil Keşfi & Görünürlük Notları
+
+Profilinizin Mastodon veya benzeri arayüzlerde görünmesini istiyorsanız:
+
+- **Aktivite Gerekliliği:** Profiliniz (actor) en az bir gönderi veya aktivite yayınlamış olmalıdır. Mastodon ve çoğu Fediverse istemcisi, uzak hesabı ancak ilk gönderi/outbox aktivitesi sonrası keşfeder ve gösterir.
+
+- **Önbellek (Cache):** Mastodon (ve benzer platformlar) uzak hesap ve gönderi verilerini **12 veya 24 saat** boyunca önbelleğe alır. İlk gönderiniz yayımlandıktan sonra profilinizin görünmesi önbellek yenilemesi sonrası gerçekleşir. Profilde yapılan değişiklikler ve yeni gönderiler için de bu gecikme süresi geçerlidir.
+
+- **İpucu:** Profilinizin hızlıca görünür olması için mutlaka bir gönderi yayınlayın. Güncellemelerin ve ilk görünmenin 12–24 saat arası gecikmeyle olabileceğini unutmayın.
+
+- **Görünürlük Yardımı:**  
+  Hesabınız ilk gönderiyi yayınladıktan sonra Mastodon veya uyumlu bir platformda hâlâ görünmüyorsa [shaanpub.shaanvision.com.tr](https://shaanpub.shaanvision.com.tr) adresini ziyaret edin. Burada görünürlük ve keşif sorunlarını gidermek için bilgi ve tanılama desteği bulabilirsiniz.
+
+---
+
+## Katkı Sağlama
+
+- Fork'layın, geliştirin ve yeni özellik/rapor/bug düzeltmesi için pull request açın.
+- Kod tabanı Tailwind/PostCSS ve modern TypeScript araçlarını kullanır.
+- ActivityPub uyumluluğu konusunda sorun yaşarsanız issue açabilirsiniz.
+
+---
+
+## Lisans
+
+GPL3 Lisansı – Detaylar için [LICENSE](LICENSE) dosyasını inceleyin.
+
+---
+
+## Linkler & Katkılar
+
+- Web Sitesi: [https://shvn.tr](https://shvn.tr)
+- GitHub: [https://github.com/shaanvision](https://github.com/shaanvision)
+- GitLab: [https://gitlab.com/shaanvision](https://gitlab.com/shaanvision)
+- Profil İkonu: ![Logo](https://www.shaanvision.com.tr/logo.png)
+
+---
