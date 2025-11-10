@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
-    "build": "next build && tsx scripts/generate-static-activitypub.ts",
+    "build": "tsx scripts/generate-static-activitypub.ts && next build",
     "start": "node server.mjs",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

@@ -43,3 +43,9 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.logprivate.pem
+
+# ActivityPub static files
+/public/users
+/public/.well-known
+/public/inbox.json
+/public/@*
