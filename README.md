@@ -202,10 +202,12 @@ npm install
   {
     "posts": [
       {
-        "author": "shaanvision",
-        "slug": "my-first-post",
-        "content": "Hello Fediverse!",
-        "published": "2025-01-01T00:00:00Z"
+        "slug": "shaanpub-activitypub-test",
+        "title": "İlk Gönderi: ShaanPub Yayında!",
+        "authorHandle": "shaanvision",
+        "published": "2024-05-20T10:00:00Z",
+        "sensitive": false,
+        "content": "<p>Merhaba Fediverse! 👋 Bu, Shaan Vision tarafından geliştirilen statik bir ActivityPub sunucusu olan <strong>ShaanPub</strong>'dan gönderilen ilk test gönderisidir. Keşfedilebilir, okunabilir ve tamamen statik olmayı hedefliyoruz!</p><p>Daha fazla bilgi için profili takip edin veya web sitemizi ziyaret edin: <a href=\"https://www.shaanvision.com.tr\">www.shaanvision.com.tr</a></p>"
       }
     ]
   }
