@@ -5,121 +5,44 @@ import { dirname, join } from "path";
 import config from "../config.json" assert { type: "json" };
 import postsData from "../posts.json" assert { type: "json" };
 
-const OUT_DIR = join(process.cwd(), "out");
+const PUBLIC_DIR = join(process.cwd(), "public");
 const BASE_URL = config.url;
-const HANDLE = config.author.handle;
 const DOMAIN = new URL(BASE_URL).hostname;
-const posts = postsData.posts;
+const allPosts = postsData.posts;
 
 // JSON file writer
 async function writeJsonToFile(path: string, data: any) {
-  const filePath = join(OUT_DIR, path);
+  const filePath = join(PUBLIC_DIR, path);
   await mkdir(dirname(filePath), { recursive: true });
   await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
   console.log(`✓ ${path}`);
 }
 
-// XML file writer
-async function writeXmlToFile(path: string, content: string) {
-  const filePath = join(OUT_DIR, path);
-  await mkdir(dirname(filePath), { recursive: true });
-  await writeFile(filePath, content, "utf-8");
-  console.log(`✓ ${path}`);
-}
-
-// HTML file writer
-async function writeHtmlToFile(path: string, content: string) {
-  const filePath = join(OUT_DIR, path);
-  await mkdir(dirname(filePath), { recursive: true });
-  await writeFile(filePath, content, "utf-8");
-  console.log(`✓ ${path}`);
-}
-
-// Redirect Page HTML
-function generateRedirectPage() {
-  const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to ShaanPub</title>
-    <meta http-equiv="refresh" content="5;url=${BASE_URL}">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            text-align: center;
-            flex-direction: column;
-        }
-        .container {
-            padding: 2rem;
-            border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        img {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 1rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <img src="https://os.shaanvision.com.tr/orb.svg" alt="Shaan Vision Orb">
-        <h1>Welcome to ShaanPub</h1>
-        <p>ShaanPub is developed by ShaanVision</p>
-        <p>Profile: <b>${HANDLE}</b></p>
-        <p id="countdown">Redirecting you to the homepage in 5 seconds...</p>
-    </div>
-    <script>
-        let countdownElement = document.getElementById('countdown');
-        let seconds = 5;
-        const interval = setInterval(() => {
-            seconds--;
-            if (seconds > 0) {
-                countdownElement.textContent = \`Redirecting you to the homepage in \${seconds} seconds...\`;
-            } else {
-                countdownElement.textContent = 'Redirecting...';
-                clearInterval(interval);
-            }
-        }, 1000);
-    </script>
-</body>
-</html>
-  `;
-  return htmlContent;
-}
-
 // WebFinger JSON
-function generateWebFinger() {
+function generateWebFinger(user: any) {
   return {
-    subject: `acct:${HANDLE}@${DOMAIN}`,
-    aliases: [`${BASE_URL}/ap/actor`, `${BASE_URL}/`],
+    subject: `acct:${user.handle}@${DOMAIN}`,
+    aliases: [
+      `${BASE_URL}/users/${user.handle}`,
+      `${BASE_URL}/users/${user.handle}.json`
+    ],
     links: [
       {
         rel: "http://webfinger.net/rel/profile-page",
         type: "text/html",
-        href: BASE_URL,
+        href: `${BASE_URL}/@${user.handle}`,
       },
       {
         rel: "self",
         type: "application/activity+json",
-        href: `${BASE_URL}/ap/actor`,
+        href: `${BASE_URL}/users/${user.handle}.json`,
       },
     ],
   };
 }
 
 // Actor JSON
-async function generateActor(publicKey: string) {
+async function generateActor(user: any, publicKey: string) {
   return {
     "@context": [
         "https://www.w3.org/ns/activitystreams",
@@ -128,42 +51,47 @@ async function generateActor(publicKey: string) {
           "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
           "toot": "http://joinmastodon.org/ns#",
           "featured": { "@id": "toot:featured", "@type": "@id" },
-          "featuredTags": { "@id": "toot:featuredTags", "@type": "@id" },
-          "alsoKnownAs": { "@id": "as:alsoKnownAs", "@type": "@id" },
-          "movedTo": { "@id": "as:movedTo", "@type": "@id" },
+          "discoverable": "toot:discoverable",
           "schema": "http://schema.org#",
           "PropertyValue": "schema:PropertyValue",
           "value": "schema:value",
-          "discoverable": "toot:discoverable",
-          "suspended": "toot:suspended",
-          "memorial": "toot:memorial",
-          "indexable": "toot:indexable",
-          "attributionDomains": { "@id": "toot:attributionDomains", "@type": "@id" }
         }
       ],
-    id: `${BASE_URL}/ap/actor`,
-    type: "Application",
-    preferredUsername: HANDLE,
-    inbox: `${BASE_URL}/ap/inbox`,
-    outbox: `${BASE_URL}/ap/outbox`,
-    followers: `${BASE_URL}/ap/followers`,
-    following: `${BASE_URL}/ap/following`,
-    featured: `${BASE_URL}/ap/collections/featured`,
-    featuredTags: `${BASE_URL}/ap/collections/tags`,
+    id: `${BASE_URL}/users/${user.handle}.json`,
+    type: "Person",
+    name: user.name,
+    preferredUsername: user.handle,
+    summary: user.bio,
+    inbox: `${BASE_URL}/users/${user.handle}/inbox.json`,
+    outbox: `${BASE_URL}/users/${user.handle}/outbox.json`,
+    followers: `${BASE_URL}/users/${user.handle}/followers.json`,
+    following: `${BASE_URL}/users/${user.handle}/following.json`,
+    icon: {
+      type: "Image",
+      mediaType: "image/png",
+      url: user.avatar,
+    },
+    image: {
+        type: "Image",
+        mediaType: "image/png",
+        url: user.avatar,
+    },
     publicKey: {
-        id: `${BASE_URL}/ap/actor#main-key`,
-        owner: `${BASE_URL}/ap/actor`,
+        id: `${BASE_URL}/users/${user.handle}.json#main-key`,
+        owner: `${BASE_URL}/users/${user.handle}.json`,
         publicKeyPem: publicKey
     },
-    endpoints: { sharedInbox: `${BASE_URL}/ap/inbox` },
-    url: `${BASE_URL}/about`,
+    attachment: user.links.map((link: any) => ({
+      type: "PropertyValue",
+      name: link.label,
+      value: `<a href="${link.href}" rel="me nofollow noopener noreferrer" target="_blank">${link.href}</a>`,
+    })),
     manuallyApprovesFollowers: true,
     discoverable: true,
-    indexable: true
+    published: new Date().toISOString(),
   };
 }
 
-// Koleksiyon oluşturucu
 function emptyCollection(id: string) {
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
@@ -174,106 +102,75 @@ function emptyCollection(id: string) {
   };
 }
 
-// Outbox JSON
-function generateOutbox() {
-  const items = posts.map((post: any) => ({
-    id: `${BASE_URL}/ap/posts/${post.slug}#activity`,
+function generateOutbox(user: any) {
+  const userPosts = allPosts.filter(p => p.authorHandle === user.handle);
+  const items = userPosts.map((post: any) => ({
+    id: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json#activity`,
     type: "Create",
-    actor: `${BASE_URL}/ap/actor`,
+    actor: `${BASE_URL}/users/${user.handle}.json`,
     published: post.published,
     to: ["https://www.w3.org/ns/activitystreams#Public"],
-    cc: [`${BASE_URL}/ap/followers`],
-    object: `${BASE_URL}/ap/posts/${post.slug}`,
+    cc: [`${BASE_URL}/users/${user.handle}/followers.json`],
+    object: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json`,
   }));
   return {
     "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${BASE_URL}/ap/outbox`,
+    id: `${BASE_URL}/users/${user.handle}/outbox.json`,
     type: "OrderedCollection",
-    totalItems: posts.length,
-    orderedItems: items,
+    totalItems: userPosts.length,
+    orderedItems: items.sort((a,b) => new Date(b.published).getTime() - new Date(a.published).getTime()),
   };
 }
 
-// Nodeinfo JSON
-function generateNodeInfo() {
-  return {
-    version: "2.0",
-    software: { name: "ShaanPub", version: "1.0.0" },
-    protocols: ["activitypub"],
-    usage: { users: { total: 1 }, localPosts: posts.length },
-    openRegistrations: false,
-    metadata: {},
-  };
-}
-
-// host-meta XML
-function generateHostMeta() {
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-  <Link rel="lrdd" type="application/jrd+json"
-        template="${BASE_URL}/.well-known/webfinger?resource={uri}" />
-</XRD>`;
-}
-
-// Her post için JSON
-async function generatePostJsons() {
-  for (const post of posts) {
+async function generatePostJsons(user: any) {
+  const userPosts = allPosts.filter(p => p.authorHandle === user.handle);
+  for (const post of userPosts) {
     const data = {
       "@context": "https://www.w3.org/ns/activitystreams",
-      id: `${BASE_URL}/ap/posts/${post.slug}`,
+      id: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json`,
       type: "Note",
       published: post.published,
-      attributedTo: `${BASE_URL}/ap/actor`,
+      attributedTo: `${BASE_URL}/users/${user.handle}.json`,
       content: post.content,
-      url: `${BASE_URL}/posts/${post.slug}`,
+      url: `${BASE_URL}/@${user.handle}/posts/${post.slug}`,
       to: ["https://www.w3.org/ns/activitystreams#Public"],
-      cc: [`${BASE_URL}/ap/followers`],
+      cc: [`${BASE_URL}/users/${user.handle}/followers.json`],
       sensitive: post.sensitive || false,
-      likes: {
-        id: `${BASE_URL}/ap/posts/${post.slug}/likes`,
-        type: "OrderedCollection",
-        totalItems: 0,
-      },
-      shares: {
-        id: `${BASE_URL}/ap/posts/${post.slug}/shares`,
-        type: "OrderedCollection",
-        totalItems: 0,
-      },
     };
-    await writeJsonToFile(`ap/posts/${post.slug}.json`, data);
+    await writeJsonToFile(`users/${user.handle}/posts/${post.slug}.json`, data);
   }
 }
 
-// Ana çalışma
 async function main() {
-  console.log("🚀 Generating static ActivityPub endpoints...\n");
+  console.log("🚀 Generating static ActivityPub files for all users...\n");
 
   const publicKey = await readFile(join(process.cwd(), "public.pem"), "utf-8");
 
-  await writeJsonToFile(".well-known/webfinger", generateWebFinger());
-  await writeXmlToFile(".well-known/host-meta.xml", generateHostMeta());
-  await writeJsonToFile(".well-known/nodeinfo.json", {
-    links: [
-      {
-        rel: "http://nodeinfo.diaspora.software/ns/schema/2.0",
-        href: `${BASE_URL}/ap/nodeinfo`,
-      },
-    ],
-  });
+  for (const user of config.users) {
+    console.log(`Generating files for ${user.handle}...`);
 
-  await writeJsonToFile("ap/actor.json", await generateActor(publicKey));
-  await writeJsonToFile("ap/inbox.json", emptyCollection(`${BASE_URL}/ap/inbox`));
-  await writeJsonToFile("ap/outbox.json", generateOutbox());
-  await writeJsonToFile("ap/followers.json", emptyCollection(`${BASE_URL}/ap/followers`));
-  await writeJsonToFile("ap/following.json", emptyCollection(`${BASE_URL}/ap/following`));
-  await writeJsonToFile("ap/nodeinfo.json", generateNodeInfo());
-  await writeJsonToFile("ap/collections/featured.json", emptyCollection(`${BASE_URL}/ap/collections/featured`));
-  await writeJsonToFile("ap/collections/tags.json", emptyCollection(`${BASE_URL}/ap/collections/tags`));
+    // Generate user-specific files
+    await writeJsonToFile(`.well-known/webfinger?resource=acct:${user.handle}@${DOMAIN}`, generateWebFinger(user));
+    await writeJsonToFile(`users/${user.handle}.json`, await generateActor(user, publicKey));
+    await writeJsonToFile(`users/${user.handle}/inbox.json`, emptyCollection(`${BASE_URL}/users/${user.handle}/inbox.json`));
+    await writeJsonToFile(`users/${user.handle}/outbox.json`, generateOutbox(user));
+    await writeJsonToFile(`users/${user.handle}/followers.json`, emptyCollection(`${BASE_URL}/users/${user.handle}/followers.json`));
+    await writeJsonToFile(`users/${user.handle}/following.json`, emptyCollection(`${BASE_URL}/users/${user.handle}/following.json`));
 
-  await generatePostJsons();
+    await generatePostJsons(user);
+    console.log(`✓ Files for ${user.handle} generated successfully!\n`);
+  }
 
-  // Generate redirect page
-  await writeHtmlToFile(`@${HANDLE}/index.html`, generateRedirectPage());
+  // Generate general discovery files
+  await writeFile(
+    join(PUBLIC_DIR, ".well-known/host-meta"),
+    `<?xml version="1.0" encoding="UTF-8"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+  <Link rel="lrdd" type="application/jrd+json" template="${BASE_URL}/.well-known/webfinger?resource={uri}" />
+</XRD>`,
+    "utf-8"
+  );
+  console.log("✓ .well-known/host-meta");
 
   console.log("\n✅ All ActivityPub files generated successfully!");
 }

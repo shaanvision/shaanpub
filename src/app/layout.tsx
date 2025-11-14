@@ -1,46 +1,36 @@
 import type { Metadata } from 'next';
+import { Inter, Zilla_Slab } from 'next/font/google';
 import './globals.css';
 import { siteConfig } from '@/lib/config';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 
-const fontBody = Inter({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-body',
+  variable: '--font-sans',
 });
 
-const fontHeadline = Space_Grotesk({
+const zillaSlab = Zilla_Slab({
   subsets: ['latin'],
   variable: '--font-headline',
+  weight: ['700'],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: `${siteConfig.name} - ${siteConfig.author.name}`,
+    default: siteConfig.name,
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: [
-    'ActivityPub',
-    'Fediverse',
-    'Static Site',
-    'Next.js',
-    'Mastodon',
-    'Decentralized',
-  ],
-  authors: [
-    {
-      name: siteConfig.author.name,
-      url: siteConfig.url,
-    },
-  ],
+  authors: {
+    name: siteConfig.author.name,
+    url: siteConfig.url,
+  },
   creator: siteConfig.author.name,
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: siteConfig.url,
     title: siteConfig.name,
     description: siteConfig.description,
-    siteName: siteConfig.name,
+    url: siteConfig.url,
     images: [
       {
         url: siteConfig.ogImage,
@@ -68,17 +58,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${fontBody.variable} ${fontHeadline.variable}`}
-    >
-      <head />
+    <html lang="en" suppressHydrationWarning>
       <body
-        className='min-h-screen bg-background font-body text-foreground antialiased'
+        className={`${inter.variable} ${zillaSlab.variable} font-sans bg-background text-foreground antialiased`}
       >
         <div className="relative flex min-h-screen flex-col">
-          <div className="flex-1">{children}</div>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
         </div>
       </body>
     </html>

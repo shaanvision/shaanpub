@@ -6,23 +6,21 @@ export const siteConfig = {
   url: config.url,
   ogImage: config.ogImage,
   description: config.description,
-  author: {
-    name: config.author.name,
-    handle: config.author.handle,
-    bio: config.author.bio,
-    avatar: config.author.avatar,
-    links: config.author.links,
-  },
+  users: config.users,
+  author: config.users[0],
 } as const;
 
 // Replace placeholders in post content
 const domain = new URL(siteConfig.url).hostname;
-export const posts = postsData.posts.map((post) => ({
-  ...post,
-  content: post.content
-    .replace(/{{handle}}/g, siteConfig.author.handle)
-    .replace(/{{domain}}/g, domain),
-}));
+export const posts = postsData.posts.map((post) => {
+  const author = siteConfig.users.find(u => u.handle === post.authorHandle);
+  return {
+    ...post,
+    content: post.content
+      .replace(/{{handle}}/g, author?.handle || '')
+      .replace(/{{domain}}/g, domain),
+  }
+});
 
 export type SiteConfig = typeof siteConfig;
 export type Post = (typeof posts)[number];

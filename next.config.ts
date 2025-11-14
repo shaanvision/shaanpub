@@ -16,8 +16,26 @@ const nextConfig: NextConfig = {
         hostname: 'www.shaanvision.com.tr',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+        port: '',
+        pathname: '/**',
       }
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/@:handle',
+        destination: '/users/:handle',
+      },
+      {
+        source: '/@:handle/posts/:slug',
+        destination: '/users/:handle/posts/:slug',
+      },
+    ];
   },
 };
 

@@ -1,51 +1,50 @@
-import { ProfileHeader } from '@/components/profile-header';
-import { PostCard } from '@/components/post-card';
-import { posts, siteConfig } from '@/lib/config';
+import { siteConfig } from '@/lib/config';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Home() {
+  const domain = new URL(siteConfig.url).hostname;
   return (
     <div className="flex flex-col items-center animate-fade-in">
       <main className="container mx-auto max-w-5xl px-4 py-8 md:py-12 lg:py-16">
-        <div className="space-y-16">
-          <ProfileHeader />
-
-          <section className="space-y-8">
-            <h2 className="font-headline text-3xl font-bold tracking-tight md:text-4xl">
-              Posts
-            </h2>
-            {posts.length > 0 ? (
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                {posts.map((post) => (
-                  <PostCard key={post.slug} post={post} />
-                ))}
-              </div>
-            ) : (
-              <p>No posts yet. Check back later!</p>
-            )}
-          </section>
+        <div className="space-y-8 text-center">
+          <h1 className="font-headline text-5xl font-bold tracking-tight md:text-6xl">
+            Welcome to {siteConfig.name}
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            {siteConfig.description}
+          </p>
         </div>
+
+        <section className="mt-24 space-y-12">
+          <h2 className="font-headline text-4xl font-bold tracking-tight md:text-5xl text-center">
+            Our Users
+          </h2>
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+            {siteConfig.users.map((user) => (
+              <Link href={`/@${user.handle}`} key={user.handle}>
+                <div className="group flex flex-col items-center space-y-6 rounded-2xl bg-card p-8 text-center shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl">
+                  <div className="relative h-28 w-28">
+                    <Image
+                      src={user.avatar}
+                      alt={user.name}
+                      width={112}
+                      height={112}
+                      className="rounded-full ring-4 ring-background transition-all duration-300 ease-in-out group-hover:ring-primary"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-headline text-2xl font-bold">{user.name}</h3>
+                    <p className="text-md text-muted-foreground">
+                      @{user.handle}@{domain}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       </main>
-      <footer className="w-full border-t border-border/50 py-6 text-center text-sm text-muted-foreground">
-        <p>
-          ShaanPub by{' '}
-          <a
-            href="https://www.shaanvision.com.tr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline transition-colors hover:text-primary"
-          >
-            Shaan Vision
-          </a>
-          .
-        </p>
-        <p>
-          Discoverable on the Fediverse as{' '}
-          <code className="font-mono">
-            @{siteConfig.author.handle}@{new URL(siteConfig.url).hostname}
-          </code>
-        </p>
-      </footer>
     </div>
   );
 }

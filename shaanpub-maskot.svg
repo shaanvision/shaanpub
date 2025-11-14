@@ -1,0 +1,55 @@
+<svg
+  viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-labelledby="shaanpub-title shaanpub-desc"
+>
+  <title id="shaanpub-title">ShaanPub Mascot</title>
+  <desc id="shaanpub-desc">
+    Static ActivityPub protokolünü temsil eden minimal maskot
+  </desc>
+  <defs>
+    <style>
+      .sp-body { fill: #3b82f6; }
+      .sp-eye { fill: #1e293b; }
+      .sp-shine { fill: #ffffff; }
+    </style>
+    <linearGradient id="sp-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Ana gövde (tek smooth shape) -->
+  <path d="
+    M 100 30
+    C 80 30, 65 45, 65 65
+    L 65 140
+    C 65 155, 75 165, 85 165
+    L 115 165
+    C 125 165, 135 155, 135 140
+    L 135 65
+    C 135 45, 120 30, 100 30 Z
+  " fill="url(#sp-gradient)" />
+  
+  <!-- Antenler -->
+  <circle cx="85" cy="35" r="6" class="sp-body" opacity="0.8" />
+  <circle cx="115" cy="35" r="6" class="sp-body" opacity="0.8" />
+  <line x1="85" y1="41" x2="85" y2="50" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" />
+  <line x1="115" y1="41" x2="115" y2="50" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" />
+  
+  <!-- Gözler -->
+  <ellipse cx="85" cy="75" rx="8" ry="10" class="sp-eye" />
+  <ellipse cx="115" cy="75" rx="8" ry="10" class="sp-eye" />
+  <circle cx="87" cy="73" r="3" class="sp-shine" />
+  <circle cx="117" cy="73" r="3" class="sp-shine" />
+  
+  <!-- Gülümseme -->
+  <path d="M 80 95 Q 100 105 120 95" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9" />
+  
+  <!-- Sayfa işareti (minimal) -->
+  <rect x="88" y="120" width="24" height="30" rx="3" fill="#ffffff" opacity="0.3" />
+  <line x1="92" y1="128" x2="108" y2="128" stroke="#ffffff" stroke-width="1.5" opacity="0.5" />
+  <line x1="92" y1="135" x2="108" y2="135" stroke="#ffffff" stroke-width="1.5" opacity="0.5" />
+  <line x1="92" y1="142" x2="104" y2="142" stroke="#ffffff" stroke-width="1.5" opacity="0.5" />
+</svg>
