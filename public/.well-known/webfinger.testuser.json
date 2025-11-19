@@ -1,0 +1,19 @@
+{
+  "subject": "acct:testuser@social.os.shaanvision.com.tr",
+  "aliases": [
+    "https://social.os.shaanvision.com.tr/@testuser",
+    "https://social.os.shaanvision.com.tr/users/testuser.json"
+  ],
+  "links": [
+    {
+      "rel": "http://webfinger.net/rel/profile-page",
+      "type": "text/html",
+      "href": "https://social.os.shaanvision.com.tr/@testuser"
+    },
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://social.os.shaanvision.com.tr/users/testuser.json"
+    }
+  ]
+}

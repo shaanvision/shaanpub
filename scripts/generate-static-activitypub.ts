@@ -23,7 +23,7 @@ function generateWebFinger(user: any) {
   return {
     subject: `acct:${user.handle}@${DOMAIN}`,
     aliases: [
-      `${BASE_URL}/users/${user.handle}`,
+      `${BASE_URL}/@${user.handle}`,
       `${BASE_URL}/users/${user.handle}.json`
     ],
     links: [
@@ -150,7 +150,7 @@ async function main() {
     console.log(`Generating files for ${user.handle}...`);
 
     // Generate user-specific files
-    await writeJsonToFile(`.well-known/webfinger?resource=acct:${user.handle}@${DOMAIN}`, generateWebFinger(user));
+    await writeJsonToFile(`.well-known/webfinger.${user.handle}.json`, generateWebFinger(user));
     await writeJsonToFile(`users/${user.handle}.json`, await generateActor(user, publicKey));
     await writeJsonToFile(`users/${user.handle}/inbox.json`, emptyCollection(`${BASE_URL}/users/${user.handle}/inbox.json`));
     await writeJsonToFile(`users/${user.handle}/outbox.json`, generateOutbox(user));

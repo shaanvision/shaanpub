@@ -1,0 +1,52 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://w3id.org/security/v1",
+    {
+      "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+      "toot": "http://joinmastodon.org/ns#",
+      "featured": {
+        "@id": "toot:featured",
+        "@type": "@id"
+      },
+      "discoverable": "toot:discoverable",
+      "schema": "http://schema.org#",
+      "PropertyValue": "schema:PropertyValue",
+      "value": "schema:value"
+    }
+  ],
+  "id": "https://social.os.shaanvision.com.tr/users/testuser.json",
+  "type": "Person",
+  "name": "Test User",
+  "preferredUsername": "testuser",
+  "summary": "This is a test user for ShaanPub.",
+  "inbox": "https://social.os.shaanvision.com.tr/users/testuser/inbox.json",
+  "outbox": "https://social.os.shaanvision.com.tr/users/testuser/outbox.json",
+  "followers": "https://social.os.shaanvision.com.tr/users/testuser/followers.json",
+  "following": "https://social.os.shaanvision.com.tr/users/testuser/following.json",
+  "icon": {
+    "type": "Image",
+    "mediaType": "image/png",
+    "url": "https://www.shaanvision.com.tr/logo.png"
+  },
+  "image": {
+    "type": "Image",
+    "mediaType": "image/png",
+    "url": "https://www.shaanvision.com.tr/logo.png"
+  },
+  "publicKey": {
+    "id": "https://social.os.shaanvision.com.tr/users/testuser.json#main-key",
+    "owner": "https://social.os.shaanvision.com.tr/users/testuser.json",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6y5YzjwCPuiy6c+OlqLH\n3xQ4HvL+apSuPi7c/EXv8/5q2Yd+slYY41whne3WgY4skj6a/okpAF26sJHc3zTW\n5LMa9MjgRA7QJz7oROmVZePfhsLsBTHCP8KNzzZSiQzNMZsUtfXl06EODsTC87ch\n+FCs8Ja85p8p6QD3IQUl8YTAO1QnN/YDQRCG4dNCEFyVAObwNOzzRElicqUngXqO\n8K5HPf8SfrUREihZdHY2GS+7pKqZk9P3qkmObXIh1aZ08JN3VjQSnf33lNn3c4j7\np8DJVgUUJXdtsV4fyPAGIYzodfctG40S/TTL3NszEly/C4Y8C120eyMsVrrn8yNF\nqwIDAQAB\n-----END PUBLIC KEY-----\n"
+  },
+  "attachment": [
+    {
+      "type": "PropertyValue",
+      "name": "Website",
+      "value": "<a href=\"https://www.shaanvision.com.tr\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\">https://www.shaanvision.com.tr</a>"
+    }
+  ],
+  "manuallyApprovesFollowers": true,
+  "discoverable": true,
+  "published": "2025-11-14T20:06:33.512Z"
+}

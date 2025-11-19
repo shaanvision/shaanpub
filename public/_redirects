@@ -1,3 +1,7 @@
 # Redirects for multi-user profiles
 /@:handle /users/:handle.html 200
 /@:handle/posts/:slug /users/:handle/posts/:slug.html 200
+
+# WebFinger redirects
+/.well-known/webfinger?resource=acct:shaanvision@social.os.shaanvision.com.tr /.well-known/webfinger.shaanvision.json 200
+/.well-known/webfinger?resource=acct:testuser@social.os.shaanvision.com.tr /.well-known/webfinger.testuser.json 200
