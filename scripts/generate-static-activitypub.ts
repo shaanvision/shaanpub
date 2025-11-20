@@ -6,11 +6,11 @@ import config from "../config.json" assert { type: "json" };
 import postsData from "../posts.json" assert { type: "json" };
 
 const PUBLIC_DIR = join(process.cwd(), "public");
-const BASE_URL = config.url;
+const BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : config.url;
 const DOMAIN = new URL(BASE_URL).hostname;
 const allPosts = postsData.posts;
 
-// JSON file writer
+// File writers
 async function writeJsonToFile(path: string, data: any) {
   const filePath = join(PUBLIC_DIR, path);
   await mkdir(dirname(filePath), { recursive: true });
@@ -18,25 +18,28 @@ async function writeJsonToFile(path: string, data: any) {
   console.log(`✓ ${path}`);
 }
 
+async function writeStringToFile(path: string, data: string) {
+    const filePath = join(PUBLIC_DIR, path);
+    await mkdir(dirname(filePath), { recursive: true });
+    await writeFile(filePath, data, "utf-8");
+    console.log(`✓ ${path}`);
+}
+
 // WebFinger JSON
 function generateWebFinger(user: any) {
   return {
     subject: `acct:${user.handle}@${DOMAIN}`,
+<<<<<<< HEAD
     aliases: [
       `${BASE_URL}/@${user.handle}`,
       `${BASE_URL}/users/${user.handle}.json`
     ],
+=======
+    aliases: [ `${BASE_URL}/@${user.handle}`, `${BASE_URL}/users/${user.handle}.json` ],
+>>>>>>> ed984de (json Fix)
     links: [
-      {
-        rel: "http://webfinger.net/rel/profile-page",
-        type: "text/html",
-        href: `${BASE_URL}/@${user.handle}`,
-      },
-      {
-        rel: "self",
-        type: "application/activity+json",
-        href: `${BASE_URL}/users/${user.handle}.json`,
-      },
+      { rel: "http://webfinger.net/rel/profile-page", type: "text/html", href: `${BASE_URL}/@${user.handle}` },
+      { rel: "self", type: "application/activity+json", href: `${BASE_URL}/users/${user.handle}.json` },
     ],
   };
 }
@@ -45,79 +48,43 @@ function generateWebFinger(user: any) {
 async function generateActor(user: any, publicKey: string) {
   return {
     "@context": [
-        "https://www.w3.org/ns/activitystreams",
-        "https://w3id.org/security/v1",
+        "https://www.w3.org/ns/activitystreams", "https://w3id.org/security/v1",
         {
-          "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
-          "toot": "http://joinmastodon.org/ns#",
-          "featured": { "@id": "toot:featured", "@type": "@id" },
-          "discoverable": "toot:discoverable",
-          "schema": "http://schema.org#",
-          "PropertyValue": "schema:PropertyValue",
-          "value": "schema:value",
+          "manuallyApprovesFollowers": "as:manuallyApprovesFollowers", "toot": "http://joinmastodon.org/ns#",
+          "featured": { "@id": "toot:featured", "@type": "@id" }, "discoverable": "toot:discoverable",
+          "schema": "http://schema.org#", "PropertyValue": "schema:PropertyValue", "value": "schema:value",
         }
       ],
     id: `${BASE_URL}/users/${user.handle}.json`,
-    type: "Person",
-    name: user.name,
-    preferredUsername: user.handle,
-    summary: user.bio,
-    inbox: `${BASE_URL}/users/${user.handle}/inbox.json`,
-    outbox: `${BASE_URL}/users/${user.handle}/outbox.json`,
-    followers: `${BASE_URL}/users/${user.handle}/followers.json`,
-    following: `${BASE_URL}/users/${user.handle}/following.json`,
-    icon: {
-      type: "Image",
-      mediaType: "image/png",
-      url: user.avatar,
-    },
-    image: {
-        type: "Image",
-        mediaType: "image/png",
-        url: user.avatar,
-    },
-    publicKey: {
-        id: `${BASE_URL}/users/${user.handle}.json#main-key`,
-        owner: `${BASE_URL}/users/${user.handle}.json`,
-        publicKeyPem: publicKey
-    },
+    type: "Person", name: user.name, preferredUsername: user.handle, summary: user.bio,
+    inbox: `${BASE_URL}/users/${user.handle}/inbox.json`, outbox: `${BASE_URL}/users/${user.handle}/outbox.json`,
+    followers: `${BASE_URL}/users/${user.handle}/followers.json`, following: `${BASE_URL}/users/${user.handle}/following.json`,
+    icon: { type: "Image", mediaType: "image/png", url: user.avatar },
+    image: { type: "Image", mediaType: "image/png", url: user.avatar },
+    publicKey: { id: `${BASE_URL}/users/${user.handle}.json#main-key`, owner: `${BASE_URL}/users/${user.handle}.json`, publicKeyPem: publicKey },
     attachment: user.links.map((link: any) => ({
-      type: "PropertyValue",
-      name: link.label,
+      type: "PropertyValue", name: link.label,
       value: `<a href="${link.href}" rel="me nofollow noopener noreferrer" target="_blank">${link.href}</a>`,
     })),
-    manuallyApprovesFollowers: true,
-    discoverable: true,
-    published: new Date().toISOString(),
+    manuallyApprovesFollowers: true, discoverable: true, published: new Date().toISOString(),
   };
 }
 
 function emptyCollection(id: string) {
-  return {
-    "@context": "https://www.w3.org/ns/activitystreams",
-    id,
-    type: "OrderedCollection",
-    totalItems: 0,
-    orderedItems: [],
-  };
+  return { "@context": "https://www.w3.org/ns/activitystreams", id, type: "OrderedCollection", totalItems: 0, orderedItems: [] };
 }
 
 function generateOutbox(user: any) {
   const userPosts = allPosts.filter(p => p.authorHandle === user.handle);
   const items = userPosts.map((post: any) => ({
-    id: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json#activity`,
-    type: "Create",
-    actor: `${BASE_URL}/users/${user.handle}.json`,
-    published: post.published,
-    to: ["https://www.w3.org/ns/activitystreams#Public"],
-    cc: [`${BASE_URL}/users/${user.handle}/followers.json`],
+    id: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json#activity`, type: "Create",
+    actor: `${BASE_URL}/users/${user.handle}.json`, published: post.published,
+    to: ["https://www.w3.org/ns/activitystreams#Public"], cc: [`${BASE_URL}/users/${user.handle}/followers.json`],
     object: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json`,
   }));
   return {
-    "@context": "https://www.w3.org/ns/activitystreams",
-    id: `${BASE_URL}/users/${user.handle}/outbox.json`,
-    type: "OrderedCollection",
-    totalItems: userPosts.length,
+    "@context": "https://www.w3.org/ns/activitystreams", id: `${BASE_URL}/users/${user.handle}/outbox.json`,
+    type: "OrderedCollection", totalItems: userPosts.length,
     orderedItems: items.sort((a,b) => new Date(b.published).getTime() - new Date(a.published).getTime()),
   };
 }
@@ -126,25 +93,22 @@ async function generatePostJsons(user: any) {
   const userPosts = allPosts.filter(p => p.authorHandle === user.handle);
   for (const post of userPosts) {
     const data = {
-      "@context": "https://www.w3.org/ns/activitystreams",
-      id: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json`,
-      type: "Note",
-      published: post.published,
-      attributedTo: `${BASE_URL}/users/${user.handle}.json`,
-      content: post.content,
-      url: `${BASE_URL}/@${user.handle}/posts/${post.slug}`,
-      to: ["https://www.w3.org/ns/activitystreams#Public"],
-      cc: [`${BASE_URL}/users/${user.handle}/followers.json`],
+      "@context": "https://www.w3.org/ns/activitystreams", id: `${BASE_URL}/users/${user.handle}/posts/${post.slug}.json`,
+      type: "Note", published: post.published, attributedTo: `${BASE_URL}/users/${user.handle}.json`,
+      content: post.content, url: `${BASE_URL}/@${user.handle}/posts/${post.slug}`,
+      to: ["https://www.w3.org/ns/activitystreams#Public"], cc: [`${BASE_URL}/users/${user.handle}/followers.json`],
       sensitive: post.sensitive || false,
     };
     await writeJsonToFile(`users/${user.handle}/posts/${post.slug}.json`, data);
   }
 }
 
+// Main generation function
 async function main() {
-  console.log("🚀 Generating static ActivityPub files for all users...\n");
+  console.log("🚀 Generating static ActivityPub files...\n");
 
   const publicKey = await readFile(join(process.cwd(), "public.pem"), "utf-8");
+  let redirectsContent = "# Static redirects for Next.js pages\n/@:handle /users/:handle.html 200\n/@:handle/posts/:slug /users/:handle/posts/:slug.html 200\n\n# WebFinger redirects\n";
 
   for (const user of config.users) {
     console.log(`Generating files for ${user.handle}...`);
@@ -156,21 +120,19 @@ async function main() {
     await writeJsonToFile(`users/${user.handle}/outbox.json`, generateOutbox(user));
     await writeJsonToFile(`users/${user.handle}/followers.json`, emptyCollection(`${BASE_URL}/users/${user.handle}/followers.json`));
     await writeJsonToFile(`users/${user.handle}/following.json`, emptyCollection(`${BASE_URL}/users/${user.handle}/following.json`));
-
     await generatePostJsons(user);
+
+    // Add WebFinger redirect rule
+    redirectsContent += `/.well-known/webfinger?resource=acct:${user.handle}@${DOMAIN} /.well-known/webfinger.${user.handle}.json 200\n`;
+
     console.log(`✓ Files for ${user.handle} generated successfully!\n`);
   }
 
   // Generate general discovery files
-  await writeFile(
-    join(PUBLIC_DIR, ".well-known/host-meta"),
-    `<?xml version="1.0" encoding="UTF-8"?>
-<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-  <Link rel="lrdd" type="application/jrd+json" template="${BASE_URL}/.well-known/webfinger?resource={uri}" />
-</XRD>`,
-    "utf-8"
-  );
-  console.log("✓ .well-known/host-meta");
+  await writeStringToFile(".well-known/host-meta", `<?xml version="1.0" encoding="UTF-8"?><XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"><Link rel="lrdd" type="application/jrd+json" template="${BASE_URL}/.well-known/webfinger?resource={uri}" /></XRD>`);
+
+  // Write the redirects file
+  await writeStringToFile("_redirects", redirectsContent);
 
   console.log("\n✅ All ActivityPub files generated successfully!");
 }

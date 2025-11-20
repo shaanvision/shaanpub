@@ -1,4 +1,4 @@
-# Redirects for multi-user profiles
+# Static redirects for Next.js pages
 /@:handle /users/:handle.html 200
 /@:handle/posts/:slug /users/:handle/posts/:slug.html 200
 
