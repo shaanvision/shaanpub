@@ -29,14 +29,7 @@ async function writeStringToFile(path: string, data: string) {
 function generateWebFinger(user: any) {
   return {
     subject: `acct:${user.handle}@${DOMAIN}`,
-<<<<<<< HEAD
-    aliases: [
-      `${BASE_URL}/@${user.handle}`,
-      `${BASE_URL}/users/${user.handle}.json`
-    ],
-=======
     aliases: [ `${BASE_URL}/@${user.handle}`, `${BASE_URL}/users/${user.handle}.json` ],
->>>>>>> ed984de (json Fix)
     links: [
       { rel: "http://webfinger.net/rel/profile-page", type: "text/html", href: `${BASE_URL}/@${user.handle}` },
       { rel: "self", type: "application/activity+json", href: `${BASE_URL}/users/${user.handle}.json` },

@@ -27,12 +27,10 @@
 
 # vercel
 .vercel
-<<<<<<< HEAD
+
 public/*
 !/public/_headers
 !/public/_redirects
-=======
 
->>>>>>> ed984de (json Fix)
 # keys
 /.keys/
