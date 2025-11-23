@@ -28,9 +28,5 @@
 # vercel
 .vercel
 
-public/*
-!/public/_headers
-!/public/_redirects
-
 # keys
 /.keys/
