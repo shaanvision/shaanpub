@@ -1,0 +1,52 @@
+{
+  "name": "ShaanPub",
+  "url": "https://social.os.shaanvision.com.tr",
+  "ogImage": "",
+  "description": "A read-only, discoverable, and static ActivityPub profile for the Fediverse.",
+  "users": [
+    {
+      "name": "Shaan Vision",
+      "handle": "shaanvision",
+      "bio": "Shaan Vision. Modern işletmeler için yenilikçi yazılım çözümleri geliştiriyor, açık kaynak felsefesini destekliyoruz. Teknoloji, kod ve gelecek üzerine konuşalım",
+      "avatar": "https://www.shaanvision.com.tr/logo.png",
+      "published": "2024-01-01T10:00:00Z",
+      "header": "https://www.shaanvision.com.tr/logo.png",
+      "featured": [
+        "shaanpub-activitypub-test"
+      ],
+      "links": [
+        {
+          "label": "Website",
+          "href": "https://shvn.tr"
+        },
+        {
+          "label": "GitHub",
+          "href": "https://github.com/shaanvision"
+        },
+        {
+          "label": "GitLab",
+          "href": "https://gitlab.com/shaanvision"
+        },
+        {
+          "label": "X",
+          "href": "https://x.com/shaanvision"
+        }
+      ]
+    },
+    {
+      "name": "Test User",
+      "handle": "shaanpub",
+      "bio": "This is a test user for ShaanPub.",
+      "avatar": "https://www.shaanvision.com.tr/logo.png",
+      "published": "2024-01-02T10:00:00Z",
+      "header": "https://www.shaanvision.com.tr/logo.png",
+      "featured": [],
+      "links": [
+        {
+          "label": "Website",
+          "href": "https://www.shaanvision.com.tr"
+        }
+      ]
+    }
+  ]
+}
