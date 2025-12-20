@@ -182,6 +182,17 @@ async function main() {
   console.log(`✓ vercel.json (Updated at project root)`);
 
 
+  // 4. Create files with literal query params in filenames (User Request)
+  // Attempting to match requests like /webfinger?resource=... by having a file literally named that.
+  for (const user of config.users) {
+    // Clean domain from BASE_URL
+    const domain = BASE_URL.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const literalFilename = `.well-known/webfinger?resource=acct:${user.handle}@${domain}`;
+
+    // We use writeJsonToFile which helps with creating dirs if needed (though .well-known exists)
+    await writeJsonToFile(literalFilename, generateWebFinger(user));
+  }
+
   console.log("\n✅ All ActivityPub and Deployment files generated successfully!");
 }
 
