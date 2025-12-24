@@ -1,7 +1,0 @@
-# Static redirects for Next.js pages
-/@:handle /:handle.html 200
-/@:handle/posts/:slug /:handle/posts/:slug.html 200
-
-# WebFinger redirects (Netlify syntax)
-/.well-known/webfinger resource=acct:shaanvision@social.os.shaanvision.com.tr /.well-known/webfinger.shaanvision.json 200
-/.well-known/webfinger resource=acct:shaanpub@social.os.shaanvision.com.tr /.well-known/webfinger.shaanpub.json 200

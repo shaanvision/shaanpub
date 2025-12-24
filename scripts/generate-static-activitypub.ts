@@ -193,6 +193,47 @@ async function main() {
     await writeJsonToFile(literalFilename, generateWebFinger(user));
   }
 
+  // 5. Cloudflare Pages Worker (_worker.js)
+  // Required because Cloudflare Pages _redirects does not support query parameter matching.
+  // This worker intercepts the request, checks for ?resource=acct:..., and fetches the correct static JSON.
+  const workerContent = `
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    // Handle WebFinger
+    if (url.pathname === '/.well-known/webfinger') {
+      const resource = url.searchParams.get('resource');
+      if (resource && resource.startsWith('acct:')) {
+        // Extract handle from acct:handle@domain
+        // We try to match what our build script generated: .well-known/webfinger.HANDLE.json
+        // Note: The script implies we trust the handle to be one of ours if we want to redirect, 
+        // or we just try to fetch the corresponding file and let it 404 if not found.
+        
+        // Simple extraction:
+        const match = resource.match(/acct:([^@]+)/);
+        if (match && match[1]) {
+          const handle = match[1];
+          const targetPath = \`/.well-known/webfinger.\${handle}.json\`;
+          
+          // Re-route to the static file
+          const newUrl = new URL(request.url);
+          newUrl.pathname = targetPath;
+          newUrl.search = ''; // Clear params to avoid loop if rules were different, mainly just cleaner
+          
+          return env.ASSETS.fetch(newUrl);
+        }
+      }
+    }
+
+    // Default: Serve static assets
+    return env.ASSETS.fetch(request);
+  }
+};`;
+
+  await writeStringToFile("_worker.js", workerContent.trim());
+
+
   console.log("\n✅ All ActivityPub and Deployment files generated successfully!");
 }
 
