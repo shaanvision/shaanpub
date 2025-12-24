@@ -20,7 +20,7 @@ const BASE_URL = config.url;
 async function writeJsonToFile(path: string, data: any) {
   const filePath = join(OUTPUT_DIR, path);
   await mkdir(dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(data, null, 2) + '\\n', "utf-8");
+  await writeFile(filePath, JSON.stringify(data, null, 2) + '\n', "utf-8");
   console.log(`✓ ${path}`);
 }
 
